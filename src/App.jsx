@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useRef } from "react"
 import { useEffect, useState } from "react"
 import TodoTemplate from "./components/TodoTemplate.jsx"
 import AddTaskForm from "./components/AddTaskForm.jsx"
@@ -11,7 +11,7 @@ const App = () => {
 	const [refreshState, setRefreshState] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
 	const [currentEditId, setCurrentEditId] = useState(null)
-	// const timeout = useRef()
+	const timeout = useRef()
 
 	let todoElems = todos.map((todo) => (
 		<TodoTemplate
@@ -42,10 +42,14 @@ const App = () => {
 		}).then(updateRefreshState())
 	}
 
-	const searchTodoInDb = (text) => {
-		fetch(`http://localhost:3000/todos?q=${text}`)
-			.then((response) => response.json())
-			.then((filteredTodos) => setTodos(filteredTodos))
+	const debounceSearchTodoInDb = (text) => {
+		console.log("debounce in progress")
+		clearTimeout(timeout.current)
+		timeout.current = setTimeout(() => {
+			fetch(`http://localhost:3000/todos?q=${text}`)
+				.then((response) => response.json())
+				.then((filteredTodos) => setTodos(filteredTodos))
+		}, 600)
 	}
 
 	const sortByNames = () => {
@@ -89,7 +93,7 @@ const App = () => {
 				<div className="todo_main">{todoElems}</div>
 			</div>
 			<AddTaskForm addTask={(newTaskText) => addTask(newTaskText)} />
-			<SearchForm searchTodo={(text) => searchTodoInDb(text)} />
+			<SearchForm searchTodo={(text) => debounceSearchTodoInDb(text)} />
 			<button onClick={() => sortByNames()}>Sort</button>
 		</div>
 	)
