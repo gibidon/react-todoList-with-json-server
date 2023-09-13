@@ -4,7 +4,7 @@ import TodoTemplate from "./components/TodoTemplate.jsx"
 import AddTaskForm from "./components/AddTaskForm.jsx"
 import EditTemplate from "./components/EditTemplate.jsx"
 import SearchForm from "./components/SearchForm.jsx"
-// import "./main.css"
+import "./main.scss"
 
 const App = () => {
 	const [todos, setTodos] = useState([])
@@ -77,34 +77,33 @@ const App = () => {
 	}, [refreshState])
 
 	return (
-		<div>
-			{isEditing && (
-				<EditTemplate
-					cancelUpdate={() => cancelUpdate()}
-					// update={(newVal) => console.log(newVal)}
-					update={(newVal) => {
-						updateTodo(newVal, currentEditId)
-						setIsEditing(false)
-					}}
-				/>
-			)}
+		<>
 			<div className="container">
-				<h1>ToDo list</h1>
+				<h1>My todos:</h1>
 				<div className="todo_main">{todoElems}</div>
+				<br />
+				<div className="todo_controls">
+					<AddTaskForm addTask={(newTaskText) => addTask(newTaskText)} />
+
+					<SearchForm searchTodo={(text) => debounceSearchTodoInDb(text)} />
+					<button onClick={() => sortByNames()} className="sortBtn">
+						Sort todos by name
+					</button>
+				</div>
+				<div className="todo_edit_form">
+					{isEditing && (
+						<EditTemplate
+							cancelUpdate={() => cancelUpdate()}
+							update={(newVal) => {
+								updateTodo(newVal, currentEditId)
+								setIsEditing(false)
+							}}
+						/>
+					)}
+				</div>
 			</div>
-			<AddTaskForm addTask={(newTaskText) => addTask(newTaskText)} />
-			<SearchForm searchTodo={(text) => debounceSearchTodoInDb(text)} />
-			<button onClick={() => sortByNames()}>Sort</button>
-		</div>
+		</>
 	)
 }
 
 export default App
-
-// let scrollDelay = 100;
-// 	let scrollTimeout;
-
-// 	document.addEventListener('scroll', function(){
-// 		clearTimeout(scrollTimeout);
-// 		scrollTimeout = setTimeout(onScroll, scrollDelay);
-// 	});

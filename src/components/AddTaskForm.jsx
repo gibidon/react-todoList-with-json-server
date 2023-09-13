@@ -7,15 +7,22 @@ export default function AddTaskForm({ addTask }) {
 	const updateState = () => {}
 
 	return (
-		<form onSubmit={() => addTask(inputState)}>
-			<label htmlFor="add_task">Enter text:</label>
+		<form
+			className="add_task"
+			onSubmit={(e) => {
+				e.preventDefault()
+				addTask(inputState)
+			}}
+		>
+			<label htmlFor="add_task">Add new todo:</label>
 			<input
 				value={inputState}
 				id="add_task"
 				type="text"
+				placeholder="enter new task"
 				onChange={(e) => setInputState(e.target.value)}
 			/>
-			<button type="submit">add task</button>
+			<button type="submit">Add todo</button>
 		</form>
 	)
 }

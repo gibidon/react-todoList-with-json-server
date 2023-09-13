@@ -1,0 +1,48 @@
+@mixin basic-button {
+	border: 1px solid transparent;
+	border-radius: 5px;
+	min-width: 60px;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: medium;
+	font-family: inherit;
+}
+
+.todo {
+	display: flex;
+	font-weight: 600;
+	justify-content: space-around;
+	background: whitesmoke;
+	border-radius: 10px;
+	opacity: 0.9;
+	min-height: 2.5rem;
+}
+
+.todo_text {
+	flex-grow: 1;
+	align-content: center;
+	align-self: center;
+	padding: 0 20px;
+}
+.todo .todo_edit_btn {
+	@include basic-button;
+	background-color: rgb(114, 158, 216);
+	color: white;
+}
+.todo_remove_btn {
+	@include basic-button;
+	background-color: rgb(248, 154, 66);
+}
+.todo:hover {
+	background-color: lightgrey;
+}
+.todo .todo_edit_btn:hover {
+	border: 1px solid blue;
+	background-color: white;
+	color: rgb(16, 17, 17);
+}
+.todo_remove_btn:hover {
+	border: 1px solid rgb(255, 255, 255);
+	background-color: rgb(253, 94, 54);
+	color: white;
+}

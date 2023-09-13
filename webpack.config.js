@@ -1,6 +1,7 @@
 const path = require("path")
 const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 const conf = {
 	mode: "development",
@@ -15,6 +16,7 @@ const conf = {
 	plugins: [
 		new HtmlWebpackPlugin({ template: "./src/index.html" }),
 		new CleanWebpackPlugin(),
+		new MiniCssExtractPlugin(),
 	],
 	module: {
 		rules: [
@@ -23,30 +25,14 @@ const conf = {
 				use: ["style-loader", "css-loader", "less-loader"],
 			},
 			{
+				test: /\.s[ac]ss$/,
+				use: ["style-loader", "css-loader", "sass-loader"],
+			},
+
+			{
 				test: /\.(jpg|jpeg|png|svg)/,
 				use: ["file-loader"],
 			},
-			// {
-			// 	test: /\.js$/,
-			// 	exclude: /node_modules/,
-			// 	loader: {
-			// 		loader: "babel-loader",
-			// 		options: {
-			// 			presets: ["@babel/preset-env"],
-			// 		},
-			// 	},
-			// },
-			// {
-			// 	test: /\.jsx$/,
-			// 	exclude: /node_modules/,
-
-			// 	loader: {
-			// 		loader: "babel-loader",
-			// 		options: {
-			// 			presets: ["@babel/preset-react", "@babel/preset-env"],
-			// 		},
-			// 	},
-			// },
 			{
 				test: /\.m?js$/,
 				exclude: /node_modules/,
@@ -67,6 +53,7 @@ const conf = {
 					},
 				},
 			},
+			{ test: /\.(ttf)$|woff|woff2|eot/, use: ["file-loader"] },
 		],
 	},
 }
