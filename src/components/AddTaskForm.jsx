@@ -4,8 +4,6 @@ import { useState } from "react"
 export default function AddTaskForm({ addTask }) {
 	const [inputState, setInputState] = useState("")
 
-	const updateState = () => {}
-
 	return (
 		<form
 			className="add_task"

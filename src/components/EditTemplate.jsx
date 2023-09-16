@@ -6,7 +6,13 @@ export default function EditTemplate({ update, cancelUpdate }) {
 	const [state, setState] = useState("")
 	return (
 		<div className={styles.edit_module}>
-			<form onSubmit={() => update(state)} className={styles.edit_content}>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault()
+					update(state)
+				}}
+				className={styles.edit_content}
+			>
 				<input
 					type="text"
 					placeholder="edit task"

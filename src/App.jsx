@@ -3,18 +3,41 @@ import { useEffect, useState } from "react"
 import TodoTemplate from "./components/TodoTemplate.jsx"
 import AddTaskForm from "./components/AddTaskForm.jsx"
 import EditTemplate from "./components/EditTemplate.jsx"
-import SearchForm from "./components/SearchForm.jsx"
+import SearchForm from "./components/SearchForm.jsx" // пробовал по аналогии с хендлерами красиво все компоненты импортировать, но дает ошибку
 import "./main.scss"
+import {
+	addHandler,
+	removeHandler,
+	// searchHandler,   // не получилось с ним
+	sortHandler,
+	updateHandler,
+} from "./handlers"
 
 const App = () => {
 	const [todos, setTodos] = useState([])
 	const [refreshState, setRefreshState] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
 	const [currentEditId, setCurrentEditId] = useState(null)
+	const updateRefreshState = () => setRefreshState(!refreshState)
+	const cancelEditing = () => setIsEditing(false)
 	const timeout = useRef()
 
+	const state = {
+		todos,
+		setTodos,
+		refreshState,
+		setRefreshState,
+		isEditing,
+		setIsEditing,
+		currentEditId,
+		setCurrentEditId,
+		timeout,
+		updateRefreshState,
+		cancelEditing,
+	}
+
 	let todoElems = todos.map((todo) => (
-		<TodoTemplate
+		<TodoTemplate // в шаблоне устанавливаем дата атрибут чтобы вытащить информацию на каком туду нажали удалить или отредактировать
 			key={todo.id}
 			title={todo.title}
 			id={todo.id}
@@ -22,28 +45,11 @@ const App = () => {
 				setIsEditing(true)
 				setCurrentEditId(todo.id)
 			}}
-			removeTodo={() => removeTask(todo.id)}
+			removeTodo={() => removeHandler(state, todo.id)}
 		/>
 	))
-
-	const updateRefreshState = () => setRefreshState(!refreshState)
-
-	const addTask = (newTaskText) => {
-		fetch("http://localhost:3000/todos", {
-			method: "POST",
-			headers: { "Content-Type": "application/json;charset=utf-8" },
-			body: JSON.stringify({ title: newTaskText }),
-		}).then(updateRefreshState())
-	}
-
-	const removeTask = (id) => {
-		fetch(`http://localhost:3000/todos/${id}`, {
-			method: "DELETE",
-		}).then(updateRefreshState())
-	}
-
 	const debounceSearchTodoInDb = (text) => {
-		console.log("debounce in progress")
+		//вот этот обработчик не получилось вынести в handlers вместе со всеми
 		clearTimeout(timeout.current)
 		timeout.current = setTimeout(() => {
 			fetch(`http://localhost:3000/todos?q=${text}`)
@@ -52,24 +58,6 @@ const App = () => {
 		}, 600)
 	}
 
-	const sortByNames = () => {
-		fetch(`http://localhost:3000/todos?_sort=title`)
-			.then((response) => response.json())
-			.then((sortedTodos) => setTodos(sortedTodos))
-			.then((data) => console.log(data))
-	}
-	const updateTodo = (newVal, id) => {
-		console.log("updateTodo working")
-		fetch(`http://localhost:3000/todos/${id}`, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json;charset=utf-8" },
-			body: JSON.stringify({ title: newVal }),
-		})
-			.then(updateRefreshState())
-			.finally(setIsEditing(false))
-	}
-	const cancelUpdate = () => setIsEditing(false)
-
 	useEffect(() => {
 		fetch("http://localhost:3000/todos")
 			.then((response) => response.json())
@@ -77,32 +65,28 @@ const App = () => {
 	}, [refreshState])
 
 	return (
-		<>
-			<div className="container">
-				<h1>My todos:</h1>
-				<div className="todo_main">{todoElems}</div>
-				<br />
-				<div className="todo_controls">
-					<AddTaskForm addTask={(newTaskText) => addTask(newTaskText)} />
-
-					<SearchForm searchTodo={(text) => debounceSearchTodoInDb(text)} />
-					<button onClick={() => sortByNames()} className="sortBtn">
-						Sort todos by name
-					</button>
-				</div>
-				<div className="todo_edit_form">
-					{isEditing && (
-						<EditTemplate
-							cancelUpdate={() => cancelUpdate()}
-							update={(newVal) => {
-								updateTodo(newVal, currentEditId)
-								setIsEditing(false)
-							}}
-						/>
-					)}
-				</div>
+		<div className="container">
+			<h1>My todos:</h1>
+			<div className="todo_main">{todoElems}</div>
+			<br />
+			<div className="todo_controls">
+				<AddTaskForm addTask={(newTaskText) => addHandler(state, newTaskText)} />
+				<SearchForm searchTodo={(text) => debounceSearchTodoInDb(text)} />
+				<button onClick={() => sortHandler(state)} className="sortBtn">
+					Sort todos by name
+				</button>
 			</div>
-		</>
+			<div className="todo_edit_form">
+				{isEditing && (
+					<EditTemplate
+						cancelUpdate={() => cancelEditing()}
+						update={(newValue) => {
+							updateHandler(state, newValue, currentEditId)
+						}}
+					/>
+				)}
+			</div>
+		</div>
 	)
 }
 
