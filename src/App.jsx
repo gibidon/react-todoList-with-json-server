@@ -8,9 +8,9 @@ import "./main.scss"
 import {
 	addHandler,
 	removeHandler,
-	// searchHandler,   // не получилось с ним
 	sortHandler,
 	updateHandler,
+	searchHandler,
 } from "./handlers"
 
 const App = () => {
@@ -48,15 +48,6 @@ const App = () => {
 			removeTodo={() => removeHandler(state, todo.id)}
 		/>
 	))
-	const debounceSearchTodoInDb = (text) => {
-		//вот этот обработчик не получилось вынести в handlers вместе со всеми
-		clearTimeout(timeout.current)
-		timeout.current = setTimeout(() => {
-			fetch(`http://localhost:3000/todos?q=${text}`)
-				.then((response) => response.json())
-				.then((filteredTodos) => setTodos(filteredTodos))
-		}, 600)
-	}
 
 	useEffect(() => {
 		fetch("http://localhost:3000/todos")
@@ -71,7 +62,7 @@ const App = () => {
 			<br />
 			<div className="todo_controls">
 				<AddTaskForm addTask={(newTaskText) => addHandler(state, newTaskText)} />
-				<SearchForm searchTodo={(text) => debounceSearchTodoInDb(text)} />
+				<SearchForm searchTodo={(text) => searchHandler(state, text)} />
 				<button onClick={() => sortHandler(state)} className="sortBtn">
 					Sort todos by name
 				</button>
