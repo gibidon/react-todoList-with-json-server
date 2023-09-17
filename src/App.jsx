@@ -18,9 +18,9 @@ const App = () => {
 	const [refreshState, setRefreshState] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
 	const [currentEditId, setCurrentEditId] = useState(null)
+	const timeout = useRef()
 	const updateRefreshState = () => setRefreshState(!refreshState)
 	const cancelEditing = () => setIsEditing(false)
-	const timeout = useRef()
 
 	const state = {
 		todos,
@@ -43,13 +43,14 @@ const App = () => {
 			id={todo.id}
 			editTodo={() => {
 				setIsEditing(true)
-				setCurrentEditId(todo.id)
+				setCurrentEditId(todo.id) //чтобы найти какую туду мы редактируем
 			}}
 			removeTodo={() => removeHandler(state, todo.id)}
 		/>
 	))
 
 	useEffect(() => {
+		//перерисовка зависит от того изменился ли параметр refreshState
 		fetch("http://localhost:3000/todos")
 			.then((response) => response.json())
 			.then((todoList) => setTodos(todoList))
